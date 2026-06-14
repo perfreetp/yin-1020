@@ -64,7 +64,7 @@ export interface AppState {
   getTasksByMachine: (machineId: string) => Task[]
   updateTask: (id: string, updates: Partial<Task>) => void
   arriveTask: (taskId: string) => void
-  finishTask: (taskId: string, actualArea?: number, actualHours?: number, beforePhotos?: string[], afterPhotos?: string[]) => void
+  finishTask: (taskId: string, actualArea?: number, actualHours?: number, beforePhotos?: string[], afterPhotos?: string[]) => Settlement | null
 
   // ========== 机械相关 ==========
   updateMachineStatus: (id: string, status: MachineStatus) => void
@@ -344,12 +344,50 @@ const useAppStore = create<AppState>()(
         const timeStr = formatTime(now)
         const { tasks, orders } = get()
         const task = tasks.find((t) => t.id === taskId)
-        if (!task) return
+        if (!task) return null
         const order = orders.find((o) => o.id === task.orderId)
-        if (!order) return
+        if (!order) return null
 
         const finalArea = actualArea ?? order.area
         const finalHours = actualHours
+
+        // 先计算 settlement（如果需要新建）
+        let settlement: Settlement | null = null
+        const existingSettlement = get().settlements.find((s) => s.orderId === task.orderId)
+        if (!existingSettlement) {
+          const unitType: 'mu' | 'hour' = order.pricePerMu ? 'mu' : 'hour'
+          const unitPrice = order.pricePerMu || order.pricePerHour || 0
+          const totalAmount = calcOrderPrice(finalArea, order.pricePerMu, finalHours, order.pricePerHour)
+          const fuelCost = finalArea * (order.pricePerMu ? 1.2 : 0)
+          const operatorFee = totalAmount * 0.25
+          const profit = totalAmount - fuelCost - operatorFee
+
+          settlement = {
+            id: 'settle_' + Date.now(),
+            orderId: order.id,
+            orderNo: order.orderNo,
+            farmerName: order.farmerName,
+            workType: order.workType,
+            area: order.area,
+            actualArea: finalArea,
+            actualHours: finalHours,
+            unitPrice,
+            unitType,
+            totalAmount,
+            subsidy: 0,
+            advanceAmount: 0,
+            paidAmount: 0,
+            unpaidAmount: totalAmount,
+            fuelCost,
+            operatorFee,
+            profit,
+            settleDate: formatDate(now),
+            status: 'pending',
+            paymentLogs: []
+          }
+        } else {
+          settlement = existingSettlement
+        }
 
         set((state) => {
           // 更新任务
@@ -383,40 +421,9 @@ const useAppStore = create<AppState>()(
             m.id === task.machineId ? { ...m, status: newMachineStatus } : m
           )
 
-          // 生成待结算记录
+          // 生成待结算记录（如果之前没有）
           let newSettlements = state.settlements
-          const existSettle = state.settlements.find((s) => s.orderId === task.orderId)
-          if (!existSettle) {
-            const unitType: 'mu' | 'hour' = order.pricePerMu ? 'mu' : 'hour'
-            const unitPrice = order.pricePerMu || order.pricePerHour || 0
-            const totalAmount = calcOrderPrice(finalArea, order.pricePerMu, finalHours, order.pricePerHour)
-            const fuelCost = finalArea * (order.pricePerMu ? 1.2 : 0)
-            const operatorFee = totalAmount * 0.25
-            const profit = totalAmount - fuelCost - operatorFee
-
-            const settlement: Settlement = {
-              id: 'settle_' + Date.now(),
-              orderId: order.id,
-              orderNo: order.orderNo,
-              farmerName: order.farmerName,
-              workType: order.workType,
-              area: order.area,
-              actualArea: finalArea,
-              actualHours: finalHours,
-              unitPrice,
-              unitType,
-              totalAmount,
-              subsidy: 0,
-              advanceAmount: 0,
-              paidAmount: 0,
-              unpaidAmount: totalAmount,
-              fuelCost,
-              operatorFee,
-              profit,
-              settleDate: formatDate(now),
-              status: 'pending',
-              paymentLogs: []
-            }
+          if (settlement && !state.settlements.find((s) => s.id === settlement!.id)) {
             newSettlements = [settlement, ...state.settlements]
             console.log('[Store] finishTask: auto-create settlement', settlement.id)
           }
@@ -429,7 +436,8 @@ const useAppStore = create<AppState>()(
           }
         })
 
-        console.log('[Store] finishTask:', taskId, 'area=' + finalArea, 'hours=' + finalHours)
+        console.log('[Store] finishTask:', taskId, 'area=' + finalArea, 'hours=' + finalHours, 'settleId=' + settlement?.id)
+        return settlement
       },
 
       // ===== 机械操作 =====

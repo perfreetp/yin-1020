@@ -114,8 +114,18 @@ const HomePage: React.FC = () => {
   }
 
   const handleDispatch = (order: Order) => {
-    Taro.navigateTo({ url: '/pages/map-dispatch/index' }).catch((err) => {
-      console.error('[Home] 跳转派工失败:', err)
+    // 先把要高亮的订单ID写入 storage（因为 switchTab 不能带参）
+    try {
+      Taro.setStorageSync('highlightOrderId', order.id)
+    } catch (e) {
+      console.warn('[Home] 写入 highlightOrderId 失败', e)
+    }
+    Taro.switchTab({
+      url: '/pages/map-dispatch/index',
+      fail: (err) => {
+        console.error('[Home] 跳转派工失败:', err)
+        Taro.showToast({ title: '跳转失败', icon: 'none' })
+      }
     })
   }
 
