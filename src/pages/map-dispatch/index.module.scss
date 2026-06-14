@@ -1,0 +1,295 @@
+@use '@/styles/variables.scss' as *;
+
+.page {
+  min-height: 100vh;
+  background: $color-bg-page;
+  display: flex;
+  flex-direction: column;
+}
+
+/* 筛选Tab */
+.filterBar {
+  display: flex;
+  padding: $spacing-sm $page-padding;
+  background: $color-bg-card;
+  gap: $spacing-sm;
+  overflow-x: auto;
+  box-shadow: 0 2rpx 8rpx rgba(0, 0, 0, 0.04);
+}
+
+.filterChip {
+  flex-shrink: 0;
+  padding: 10rpx 28rpx;
+  border-radius: $radius-button;
+  background: $color-bg-hover;
+  font-size: $font-size-sm;
+  color: $color-text-secondary;
+  font-weight: $font-weight-medium;
+  transition: all $transition-base;
+}
+
+.filterChipActive {
+  background: $color-primary-gradient;
+  color: $color-text-white;
+}
+
+/* 地图区 */
+.mapArea {
+  height: 520rpx;
+  background: linear-gradient(135deg, #E8F5E9 0%, #F1F8E9 50%, #E8F5E9 100%);
+  position: relative;
+  overflow: hidden;
+  margin: $spacing-md $page-padding;
+  border-radius: $radius-lg;
+  box-shadow: inset 0 0 40rpx rgba(46, 139, 87, 0.1);
+}
+
+.mapGrid {
+  position: absolute;
+  inset: 0;
+  background-image:
+    linear-gradient(rgba(46, 139, 87, 0.06) 1rpx, transparent 1rpx),
+    linear-gradient(90deg, rgba(46, 139, 87, 0.06) 1rpx, transparent 1rpx);
+  background-size: 60rpx 60rpx;
+}
+
+.mapRoad {
+  position: absolute;
+  left: 30%;
+  top: 0;
+  bottom: 0;
+  width: 24rpx;
+  background: rgba(255, 255, 255, 0.6);
+  transform: skewX(-8deg);
+}
+
+.mapRoad2 {
+  position: absolute;
+  left: 0;
+  top: 55%;
+  width: 100%;
+  height: 20rpx;
+  background: rgba(255, 255, 255, 0.55);
+}
+
+.villageLabel {
+  position: absolute;
+  padding: 6rpx 16rpx;
+  background: rgba(255, 255, 255, 0.85);
+  border-radius: $radius-sm;
+  font-size: $font-size-xs;
+  color: $color-primary-dark;
+  font-weight: $font-weight-semibold;
+  box-shadow: 0 2rpx 8rpx rgba(0, 0, 0, 0.06);
+}
+
+/* 地图标记点 */
+.mapMarker {
+  position: absolute;
+  z-index: 10;
+  transform: translate(-50%, -100%);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.markerPin {
+  padding: 8rpx 14rpx;
+  border-radius: $radius-round;
+  font-size: 24rpx;
+  font-weight: $font-weight-bold;
+  color: $color-text-white;
+  display: flex;
+  align-items: center;
+  gap: 4rpx;
+  box-shadow: 0 4rpx 12rpx rgba(0, 0, 0, 0.2);
+  position: relative;
+
+  &::after {
+    content: '';
+    position: absolute;
+    bottom: -8rpx;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 0;
+    height: 0;
+    border-left: 8rpx solid transparent;
+    border-right: 8rpx solid transparent;
+  }
+}
+
+.markerOrder {
+  background: linear-gradient(135deg, #F5222D 0%, #FF7875 100%);
+
+  &::after {
+    border-top: 10rpx solid #FF7875;
+  }
+}
+
+.markerMachine {
+  background: linear-gradient(135deg, #1890FF 0%, #40A9FF 100%);
+
+  &::after {
+    border-top: 10rpx solid #40A9FF;
+  }
+}
+
+.markerSelected {
+  .markerPin {
+    transform: scale(1.2);
+    box-shadow: 0 6rpx 20rpx rgba(245, 34, 45, 0.4);
+  }
+}
+
+.markerPulse {
+  position: absolute;
+  top: 30%;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 60rpx;
+  height: 60rpx;
+  border-radius: 50%;
+  background: rgba(24, 144, 255, 0.25);
+  animation: pulse 2s ease-in-out infinite;
+  z-index: -1;
+}
+
+@keyframes pulse {
+  0%, 100% { transform: translateX(-50%) scale(1); opacity: 0.6; }
+  50% { transform: translateX(-50%) scale(1.5); opacity: 0; }
+}
+
+/* 待派工订单横向列表 */
+.ordersSection {
+  padding: 0 $page-padding $spacing-md;
+}
+
+.sectionTitle {
+  font-size: $font-size-md;
+  font-weight: $font-weight-semibold;
+  color: $color-text-primary;
+  margin-bottom: $spacing-md;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.titleBadge {
+  font-size: $font-size-xs;
+  padding: 4rpx 16rpx;
+  background: rgba(245, 34, 45, 0.1);
+  color: $color-error;
+  border-radius: $radius-sm;
+  font-weight: $font-weight-medium;
+}
+
+.ordersScroller {
+  margin: 0 (-$page-padding);
+  padding: 0 $page-padding;
+}
+
+.orderChip {
+  @include scroll-x-item(540rpx);
+  background: $color-bg-card;
+  border-radius: $radius-lg;
+  padding: $spacing-md;
+  margin-right: $spacing-md;
+  box-shadow: $shadow-card;
+  border: 3rpx solid transparent;
+  transition: all $transition-base;
+}
+
+.orderChipActive {
+  border-color: $color-primary;
+  box-shadow: 0 4rpx 20rpx rgba(46, 139, 87, 0.18);
+}
+
+.chipTop {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: $spacing-sm;
+}
+
+.chipFarmer {
+  font-size: $font-size-md;
+  font-weight: $font-weight-semibold;
+  color: $color-text-primary;
+  display: flex;
+  align-items: center;
+  gap: $spacing-sm;
+}
+
+.chipArea {
+  font-size: $font-size-sm;
+  color: $color-text-secondary;
+  margin-bottom: 6rpx;
+
+  .num {
+    font-size: $font-size-lg;
+    font-weight: $font-weight-bold;
+    color: $color-primary;
+    margin: 0 4rpx;
+  }
+}
+
+.chipAddr {
+  font-size: $font-size-sm;
+  color: $color-text-tertiary;
+  @include text-ellipsis;
+}
+
+/* 推荐机械 */
+.recommendSection {
+  flex: 1;
+  background: $color-bg-card;
+  border-top-left-radius: $radius-xl;
+  border-top-right-radius: $radius-xl;
+  padding: $spacing-lg $page-padding 48rpx;
+  margin-top: $spacing-xs;
+  box-shadow: 0 -4rpx 16rpx rgba(0, 0, 0, 0.06);
+  overflow-y: auto;
+}
+
+.recommendHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: $spacing-md;
+}
+
+.recommendTitle {
+  font-size: $font-size-lg;
+  font-weight: $font-weight-semibold;
+  color: $color-text-primary;
+  display: flex;
+  align-items: center;
+  gap: $spacing-sm;
+}
+
+.titleHint {
+  font-size: $font-size-xs;
+  color: $color-text-tertiary;
+  font-weight: normal;
+}
+
+.selectedHint {
+  padding: 8rpx 20rpx;
+  background: rgba(46, 139, 87, 0.08);
+  color: $color-primary;
+  border-radius: $radius-button;
+  font-size: $font-size-xs;
+  font-weight: $font-weight-medium;
+}
+
+.emptyHint {
+  padding: $spacing-xxl;
+  text-align: center;
+  font-size: $font-size-md;
+  color: $color-text-tertiary;
+}
+
+/* 通用组件嵌入 */
+:global {
+  .machine-card { margin-bottom: $spacing-md; }
+}

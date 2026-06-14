@@ -1,0 +1,154 @@
+@use '@/styles/variables.scss' as *;
+
+.orderCard {
+  background: $color-bg-card;
+  border-radius: $radius-lg;
+  padding: $spacing-lg;
+  margin-bottom: $spacing-md;
+  box-shadow: $shadow-card;
+  transition: all $transition-base;
+
+  &:active {
+    transform: translateY(2rpx);
+    box-shadow: 0 2rpx 8rpx rgba(0, 0, 0, 0.06);
+  }
+}
+
+.cardHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: $spacing-md;
+}
+
+.orderNo {
+  font-size: $font-size-sm;
+  color: $color-text-tertiary;
+}
+
+.farmerRow {
+  display: flex;
+  align-items: center;
+  margin-bottom: $spacing-sm;
+}
+
+.farmerIcon {
+  width: 56rpx;
+  height: 56rpx;
+  border-radius: $radius-round;
+  background: rgba(46, 139, 87, 0.1);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-right: $spacing-sm;
+  font-size: 28rpx;
+  flex-shrink: 0;
+}
+
+.farmerInfo {
+  flex: 1;
+  min-width: 0;
+}
+
+.farmerName {
+  font-size: $font-size-lg;
+  font-weight: $font-weight-semibold;
+  color: $color-text-primary;
+  margin-right: $spacing-sm;
+}
+
+.workTypeBadge {
+  display: inline-block;
+  padding: 2rpx 12rpx;
+  background: rgba(46, 139, 87, 0.08);
+  color: $color-primary;
+  border-radius: $radius-xs;
+  font-size: $font-size-xs;
+  font-weight: $font-weight-medium;
+}
+
+.infoRow {
+  display: flex;
+  align-items: flex-start;
+  margin-bottom: $spacing-xs;
+  font-size: $font-size-md;
+  color: $color-text-secondary;
+}
+
+.infoIcon {
+  width: 32rpx;
+  margin-right: $spacing-xs;
+  flex-shrink: 0;
+  text-align: center;
+}
+
+.infoText {
+  flex: 1;
+  line-height: 1.5;
+}
+
+.divider {
+  height: 1rpx;
+  background: $color-divider;
+  margin: $spacing-md 0;
+}
+
+.cardFooter {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.areaPrice {
+  display: flex;
+  align-items: baseline;
+  gap: $spacing-md;
+}
+
+.areaText {
+  font-size: $font-size-md;
+  color: $color-text-secondary;
+
+  .num {
+    font-size: $font-size-xl;
+    font-weight: $font-weight-bold;
+    color: $color-primary;
+    margin: 0 4rpx;
+  }
+}
+
+.priceText {
+  font-size: $font-size-md;
+  color: $color-text-secondary;
+
+  .num {
+    font-size: $font-size-lg;
+    font-weight: $font-weight-bold;
+    color: $color-accent;
+    margin: 0 4rpx;
+  }
+}
+
+.actionArea {
+  display: flex;
+  gap: $spacing-sm;
+}
+
+.btn {
+  padding: 12rpx 28rpx;
+  border-radius: $radius-button;
+  font-size: $font-size-sm;
+  font-weight: $font-weight-medium;
+  line-height: 1.4;
+}
+
+.btnPrimary {
+  background: $color-primary-gradient;
+  color: $color-text-white;
+}
+
+.btnOutline {
+  background: transparent;
+  border: 2rpx solid $color-primary;
+  color: $color-primary;
+}

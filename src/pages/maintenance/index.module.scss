@@ -1,0 +1,550 @@
+@use '@/styles/variables.scss' as *;
+
+.page {
+  min-height: 100vh;
+  background: $color-bg-page;
+  padding-bottom: 160rpx;
+  position: relative;
+}
+
+/* 顶部Tab */
+.tabsBar {
+  display: flex;
+  background: $color-bg-card;
+  padding: 6rpx;
+  margin: $spacing-md $page-padding;
+  border-radius: $radius-button;
+  box-shadow: $shadow-card;
+}
+
+.tabItem {
+  flex: 1;
+  padding: $spacing-sm 0;
+  border-radius: $radius-button;
+  font-size: $font-size-sm;
+  text-align: center;
+  font-weight: $font-weight-medium;
+  color: $color-text-secondary;
+  transition: all $transition-base;
+}
+
+.tabItemActive {
+  background: $color-primary-gradient;
+  color: $color-text-white;
+  box-shadow: 0 4rpx 12rpx rgba(46, 139, 87, 0.25);
+}
+
+/* 统计栏 */
+.statsBar {
+  display: flex;
+  padding: $spacing-md $page-padding;
+  gap: $spacing-md;
+}
+
+.statBox {
+  flex: 1;
+  background: $color-bg-card;
+  border-radius: $radius-md;
+  padding: $spacing-md;
+  box-shadow: $shadow-card;
+  text-align: center;
+}
+
+.statNum {
+  font-size: $font-size-xl;
+  font-weight: $font-weight-bold;
+  line-height: 1.2;
+}
+
+.statLabel {
+  font-size: $font-size-xs;
+  color: $color-text-tertiary;
+  margin-top: 4rpx;
+}
+
+/* 分组标题 */
+.groupTitle {
+  display: flex;
+  align-items: center;
+  padding: $spacing-md $page-spacing $spacing-sm $page-padding;
+  padding-left: $page-padding;
+}
+
+.groupLabel {
+  font-size: $font-size-sm;
+  font-weight: $font-weight-semibold;
+  color: $color-text-primary;
+}
+
+.groupCount {
+  font-size: $font-size-xs;
+  padding: 2rpx 12rpx;
+  border-radius: $radius-round;
+  background: $color-bg-hover;
+  color: $color-text-secondary;
+  margin-left: $spacing-xs;
+}
+
+/* 故障卡片 */
+.repairCard {
+  background: $color-bg-card;
+  border-radius: $radius-lg;
+  margin: 0 $page-padding $spacing-md;
+  padding: $spacing-lg;
+  box-shadow: $shadow-card;
+  border-left: 8rpx solid $color-border;
+  transition: all $transition-base;
+}
+
+.repairPending {
+  border-left-color: $color-error;
+}
+
+.repairRepairing {
+  border-left-color: $color-accent;
+}
+
+.repairDone {
+  border-left-color: $color-success;
+}
+
+.repairHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: $spacing-sm;
+}
+
+.machineInfo {
+  display: flex;
+  align-items: center;
+  flex: 1;
+  min-width: 0;
+}
+
+.machineIcon {
+  width: 64rpx;
+  height: 64rpx;
+  border-radius: $radius-md;
+  background: rgba(245, 34, 45, 0.1);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 32rpx;
+  margin-right: $spacing-sm;
+  flex-shrink: 0;
+}
+
+.machineName {
+  font-size: $font-size-md;
+  font-weight: $font-weight-semibold;
+  color: $color-text-primary;
+  @include text-ellipsis;
+}
+
+.faultDesc {
+  font-size: $font-size-md;
+  color: $color-text-primary;
+  line-height: 1.5;
+  padding: $spacing-sm $spacing-md;
+  background: $color-bg-hover;
+  border-radius: $radius-sm;
+  margin-bottom: $spacing-sm;
+  border-left: 4rpx solid $color-accent;
+}
+
+.infoRow {
+  display: flex;
+  font-size: $font-size-sm;
+  color: $color-text-secondary;
+  margin-bottom: 6rpx;
+
+  .infoIcon {
+    width: 32rpx;
+    margin-right: $spacing-xs;
+    text-align: center;
+  }
+}
+
+/* 替换设备提示 */
+.replaceBox {
+  margin-top: $spacing-md;
+  padding: $spacing-md;
+  background: linear-gradient(135deg, #FFF7E6 0%, #FFE7BA 100%);
+  border-radius: $radius-md;
+}
+
+.replaceTitle {
+  font-size: $font-size-sm;
+  font-weight: $font-weight-semibold;
+  color: $color-accent;
+  margin-bottom: $spacing-sm;
+  display: flex;
+  align-items: center;
+  gap: 8rpx;
+}
+
+.replaceItem {
+  background: rgba(255, 255, 255, 0.7);
+  padding: $spacing-sm $spacing-md;
+  border-radius: $radius-sm;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: $spacing-xs;
+
+  &:last-child {
+    margin-bottom: 0;
+  }
+}
+
+.replaceName {
+  font-size: $font-size-sm;
+  color: $color-text-primary;
+  font-weight: $font-weight-medium;
+}
+
+/* 操作按钮 */
+.cardActions {
+  display: flex;
+  gap: $spacing-sm;
+  margin-top: $spacing-md;
+  padding-top: $spacing-md;
+  border-top: 1rpx solid $color-divider;
+}
+
+.actionBtn {
+  flex: 1;
+  height: $button-height-md;
+  border-radius: $radius-button;
+  font-size: $font-size-sm;
+  font-weight: $font-weight-medium;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 2rpx solid transparent;
+}
+
+.btnPrimary {
+  background: $color-primary-gradient;
+  color: $color-text-white;
+}
+
+.btnOutline {
+  background: transparent;
+  border-color: $color-primary;
+  color: $color-primary;
+}
+
+.btnOrange {
+  background: linear-gradient(135deg, #FAAD14 0%, #FA8C16 100%);
+  color: $color-text-white;
+}
+
+.btnRed {
+  background: linear-gradient(135deg, #F5222D 0%, #FF7875 100%);
+  color: $color-text-white;
+}
+
+/* 浮动按钮 */
+.fab {
+  position: fixed;
+  right: $page-padding;
+  bottom: calc(#{$page-padding} + 120rpx);
+  width: 120rpx;
+  height: 120rpx;
+  border-radius: $radius-round;
+  background: $color-primary-gradient;
+  color: $color-text-white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+  box-shadow: 0 8rpx 24rpx rgba(46, 139, 87, 0.35);
+  z-index: 99;
+  transition: all $transition-base;
+
+  &:active {
+    transform: scale(0.94);
+  }
+
+  .fabIcon {
+    font-size: 44rpx;
+    line-height: 1;
+    margin-bottom: 2rpx;
+  }
+
+  .fabText {
+    font-size: 20rpx;
+    font-weight: $font-weight-medium;
+  }
+}
+
+/* 保养部分 */
+.reminderCard {
+  margin: 0 $page-padding $spacing-md;
+  background: linear-gradient(135deg, #FFF1F0 0%, #FFCCC7 100%);
+  border-radius: $radius-lg;
+  padding: $spacing-lg;
+  display: flex;
+  align-items: center;
+  box-shadow: $shadow-card;
+}
+
+.reminderIcon {
+  width: 80rpx;
+  height: 80rpx;
+  border-radius: $radius-round;
+  background: rgba(245, 34, 45, 0.15);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 40rpx;
+  margin-right: $spacing-md;
+  flex-shrink: 0;
+}
+
+.reminderInfo {
+  flex: 1;
+  min-width: 0;
+}
+
+.reminderTitle {
+  font-size: $font-size-md;
+  font-weight: $font-weight-semibold;
+  color: $color-error;
+  margin-bottom: 6rpx;
+}
+
+.reminderText {
+  font-size: $font-size-sm;
+  color: #8B0000;
+}
+
+/* 保养记录时间轴 */
+.maintenanceTimeline {
+  padding: 0 $page-padding;
+}
+
+.timelineItem {
+  display: flex;
+  padding-bottom: $spacing-lg;
+  position: relative;
+
+  &:last-child {
+    padding-bottom: 0;
+  }
+}
+
+.timelineLeft {
+  width: 160rpx;
+  flex-shrink: 0;
+  padding-right: $spacing-md;
+  text-align: right;
+}
+
+.timelineDate {
+  font-size: $font-size-sm;
+  font-weight: $font-weight-semibold;
+  color: $color-text-primary;
+}
+
+.timelineNext {
+  font-size: $font-size-xs;
+  color: $color-accent;
+  margin-top: 6rpx;
+}
+
+.timelineMiddle {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 36rpx;
+  flex-shrink: 0;
+  position: relative;
+}
+
+.timelineDot {
+  width: 24rpx;
+  height: 24rpx;
+  border-radius: $radius-round;
+  background: $color-success;
+  border: 4rpx solid $color-bg-card;
+  box-shadow: 0 0 0 2rpx $color-success;
+  flex-shrink: 0;
+  margin-top: 6rpx;
+  z-index: 2;
+}
+
+.timelineDotWarning {
+  background: $color-warning;
+  box-shadow: 0 0 0 2rpx $color-warning;
+}
+
+.timelineLine {
+  width: 4rpx;
+  flex: 1;
+  background: $color-divider;
+  margin-top: $spacing-xs;
+}
+
+.timelineRight {
+  flex: 1;
+  padding-left: $spacing-md;
+  min-width: 0;
+}
+
+.maintCard {
+  background: $color-bg-card;
+  border-radius: $radius-md;
+  padding: $spacing-md;
+  box-shadow: $shadow-card;
+}
+
+.maintType {
+  font-size: $font-size-md;
+  font-weight: $font-weight-semibold;
+  color: $color-text-primary;
+  margin-bottom: 6rpx;
+  display: flex;
+  align-items: center;
+  gap: $spacing-xs;
+}
+
+.maintMachine {
+  font-size: $font-size-sm;
+  color: $color-text-secondary;
+  margin-bottom: 6rpx;
+}
+
+.maintDetail {
+  font-size: $font-size-sm;
+  color: $color-text-secondary;
+  line-height: 1.5;
+}
+
+.maintCost {
+  margin-top: $spacing-sm;
+  padding-top: $spacing-sm;
+  border-top: 1rpx solid $color-divider;
+  font-size: $font-size-sm;
+  color: $color-text-secondary;
+  display: flex;
+  justify-content: space-between;
+
+  .amount {
+    color: $color-accent;
+    font-weight: $font-weight-semibold;
+  }
+}
+
+/* 弹窗样式 */
+.modalOverlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.5);
+  z-index: 999;
+  display: flex;
+  align-items: flex-end;
+}
+
+.modalContent {
+  width: 100%;
+  background: $color-bg-card;
+  border-top-left-radius: $radius-xl;
+  border-top-right-radius: $radius-xl;
+  padding: $spacing-xl $page-padding;
+  padding-bottom: calc(#{$spacing-xl} + env(safe-area-inset-bottom));
+  max-height: 85vh;
+  overflow-y: auto;
+}
+
+.modalTitle {
+  font-size: $font-size-xl;
+  font-weight: $font-weight-bold;
+  color: $color-text-primary;
+  text-align: center;
+  margin-bottom: $spacing-xl;
+}
+
+.formGroup {
+  margin-bottom: $spacing-lg;
+}
+
+.formLabel {
+  font-size: $font-size-sm;
+  color: $color-text-secondary;
+  margin-bottom: $spacing-sm;
+  display: block;
+
+  .required {
+    color: $color-error;
+    margin-right: 4rpx;
+  }
+}
+
+.formSelect {
+  padding: $spacing-md;
+  background: $color-bg-hover;
+  border-radius: $radius-md;
+  font-size: $font-size-md;
+  color: $color-text-primary;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.formTextarea {
+  width: 100%;
+  min-height: 200rpx;
+  padding: $spacing-md;
+  background: $color-bg-hover;
+  border-radius: $radius-md;
+  font-size: $font-size-md;
+  color: $color-text-primary;
+  box-sizing: border-box;
+}
+
+.urgencyRow {
+  display: flex;
+  gap: $spacing-sm;
+}
+
+.urgencyBtn {
+  flex: 1;
+  padding: $spacing-sm;
+  border-radius: $radius-button;
+  border: 2rpx solid transparent;
+  font-size: $font-size-sm;
+  text-align: center;
+  font-weight: $font-weight-medium;
+  background: $color-bg-hover;
+  color: $color-text-secondary;
+}
+
+.urgencyActive {
+  border-color: currentColor;
+  background: rgba(245, 34, 45, 0.06);
+}
+
+.urgencyNormal { color: $color-info; }
+.urgencyHigh { color: $color-warning; }
+.urgencyUrgent { color: $color-error; }
+
+.modalActions {
+  display: flex;
+  gap: $spacing-md;
+  margin-top: $spacing-xl;
+}
+
+.modalBtn {
+  flex: 1;
+  height: $button-height-lg;
+  border-radius: $radius-button;
+  font-size: $font-size-lg;
+  font-weight: $font-weight-semibold;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 2rpx solid transparent;
+}

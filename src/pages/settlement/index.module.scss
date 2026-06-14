@@ -1,0 +1,442 @@
+@use '@/styles/variables.scss' as *;
+
+.page {
+  min-height: 100vh;
+  background: $color-bg-page;
+  padding-bottom: 120rpx;
+}
+
+/* 顶部头部 */
+.header {
+  background: $color-primary-gradient;
+  padding: $spacing-xxl $page-padding;
+  padding-top: 56rpx;
+  color: $color-text-white;
+  position: relative;
+  overflow: hidden;
+}
+
+.headerTitle {
+  font-size: $font-size-md;
+  opacity: 0.9;
+  margin-bottom: $spacing-xs;
+}
+
+.headerAmount {
+  font-size: 60rpx;
+  font-weight: $font-weight-bold;
+  line-height: 1.1;
+  margin-bottom: $spacing-xs;
+
+  .yuan {
+    font-size: 32rpx;
+    font-weight: normal;
+    margin-right: 8rpx;
+    opacity: 0.85;
+  }
+}
+
+.headerSub {
+  font-size: $font-size-sm;
+  opacity: 0.8;
+}
+
+/* 汇总卡片 */
+.summaryRow {
+  display: flex;
+  gap: $spacing-sm;
+  padding: 0 $page-padding;
+  margin-top: -40rpx;
+  position: relative;
+  z-index: 10;
+}
+
+/* Tab切换 */
+.tabsBar {
+  display: flex;
+  margin: $spacing-md $page-padding;
+  background: $color-bg-card;
+  border-radius: $radius-button;
+  padding: 6rpx;
+  box-shadow: $shadow-card;
+}
+
+.tabItem {
+  flex: 1;
+  padding: $spacing-sm 0;
+  border-radius: $radius-button;
+  font-size: $font-size-sm;
+  text-align: center;
+  font-weight: $font-weight-medium;
+  color: $color-text-secondary;
+  transition: all $transition-base;
+}
+
+.tabItemActive {
+  background: $color-primary-gradient;
+  color: $color-text-white;
+  box-shadow: 0 4rpx 12rpx rgba(46, 139, 87, 0.25);
+}
+
+/* 列表 */
+.listWrap {
+  padding: 0 $page-padding;
+}
+
+.settleCard {
+  background: $color-bg-card;
+  border-radius: $radius-lg;
+  padding: $spacing-lg;
+  margin-bottom: $spacing-md;
+  box-shadow: $shadow-card;
+}
+
+.cardTop {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: $spacing-md;
+}
+
+.farmerInfo {
+  display: flex;
+  align-items: center;
+  flex: 1;
+  min-width: 0;
+}
+
+.farmerAvatar {
+  width: 64rpx;
+  height: 64rpx;
+  border-radius: $radius-round;
+  background: rgba(46, 139, 87, 0.1);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 32rpx;
+  margin-right: $spacing-sm;
+  flex-shrink: 0;
+}
+
+.farmerName {
+  font-size: $font-size-md;
+  font-weight: $font-weight-semibold;
+  color: $color-text-primary;
+  margin-right: $spacing-sm;
+}
+
+.workBadge {
+  padding: 2rpx 12rpx;
+  background: rgba(46, 139, 87, 0.08);
+  color: $color-primary;
+  border-radius: $radius-xs;
+  font-size: $font-size-xs;
+  font-weight: $font-weight-medium;
+}
+
+.cardMid {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: $spacing-sm 0;
+  border-top: 1rpx solid $color-divider;
+  border-bottom: 1rpx solid $color-divider;
+}
+
+.areaInfo {
+  font-size: $font-size-sm;
+  color: $color-text-secondary;
+
+  .num {
+    font-size: $font-size-lg;
+    font-weight: $font-weight-bold;
+    color: $color-primary;
+    margin: 0 4rpx;
+  }
+}
+
+.priceInfo {
+  font-size: $font-size-sm;
+  color: $color-text-secondary;
+  text-align: right;
+
+  .num {
+    font-size: $font-size-xl;
+    font-weight: $font-weight-bold;
+    color: $color-accent;
+    margin: 0 4rpx;
+  }
+}
+
+.orderNoRow {
+  font-size: $font-size-xs;
+  color: $color-text-tertiary;
+  margin-top: $spacing-sm;
+  display: flex;
+  justify-content: space-between;
+}
+
+/* 展开区-明细 */
+.detailArea {
+  margin-top: $spacing-md;
+  padding: $spacing-md;
+  background: $color-bg-hover;
+  border-radius: $radius-md;
+}
+
+.detailTitle {
+  font-size: $font-size-sm;
+  font-weight: $font-weight-semibold;
+  color: $color-text-primary;
+  margin-bottom: $spacing-sm;
+}
+
+.detailRow {
+  display: flex;
+  justify-content: space-between;
+  padding: 8rpx 0;
+  font-size: $font-size-sm;
+}
+
+.detailLabel {
+  color: $color-text-secondary;
+}
+
+.detailValue {
+  color: $color-text-primary;
+  font-weight: $font-weight-medium;
+}
+
+.detailValue.success {
+  color: $color-success;
+}
+
+.detailValue.error {
+  color: $color-error;
+}
+
+.detailDivider {
+  height: 1rpx;
+  background: rgba(0, 0, 0, 0.05);
+  margin: 8rpx 0;
+}
+
+.detailProfit {
+  display: flex;
+  justify-content: space-between;
+  padding-top: $spacing-sm;
+  margin-top: $spacing-sm;
+  border-top: 2rpx dashed $color-border;
+  font-size: $font-size-md;
+  font-weight: $font-weight-semibold;
+
+  .label {
+    color: $color-text-primary;
+  }
+
+  .value {
+    color: $color-primary;
+    font-size: $font-size-lg;
+  }
+}
+
+/* 操作按钮 */
+.cardActions {
+  display: flex;
+  gap: $spacing-sm;
+  margin-top: $spacing-md;
+}
+
+.actionBtn {
+  flex: 1;
+  height: $button-height-md;
+  border-radius: $radius-button;
+  font-size: $font-size-sm;
+  font-weight: $font-weight-medium;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 2rpx solid transparent;
+}
+
+.btnPrimary {
+  background: $color-primary-gradient;
+  color: $color-text-white;
+}
+
+.btnOutline {
+  background: transparent;
+  border-color: $color-primary;
+  color: $color-primary;
+}
+
+.btnOrange {
+  background: linear-gradient(135deg, #FAAD14 0%, #FA8C16 100%);
+  color: $color-text-white;
+}
+
+/* 季节汇总卡片 */
+.seasonCard {
+  margin: $spacing-lg $page-padding 0;
+  background: linear-gradient(135deg, #2E8B57 0%, #52C41A 100%);
+  border-radius: $radius-lg;
+  padding: $spacing-xl $spacing-lg;
+  color: $color-text-white;
+  box-shadow: 0 8rpx 24rpx rgba(46, 139, 87, 0.25);
+}
+
+.seasonTitle {
+  font-size: $font-size-md;
+  font-weight: $font-weight-semibold;
+  opacity: 0.95;
+  margin-bottom: $spacing-lg;
+  display: flex;
+  align-items: center;
+}
+
+.seasonGrid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: $spacing-lg;
+}
+
+.seasonItem {
+  .label {
+    font-size: $font-size-xs;
+    opacity: 0.8;
+    margin-bottom: 6rpx;
+  }
+
+  .value {
+    font-size: $font-size-xl;
+    font-weight: $font-weight-bold;
+    line-height: 1.2;
+  }
+}
+
+/* 类型分布 */
+.distributionCard {
+  margin: $spacing-md $page-padding 0;
+  background: $color-bg-card;
+  border-radius: $radius-lg;
+  padding: $spacing-lg;
+  box-shadow: $shadow-card;
+}
+
+.cardTitleRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: $spacing-md;
+}
+
+.cardTitle {
+  font-size: $font-size-md;
+  font-weight: $font-weight-semibold;
+  color: $color-text-primary;
+}
+
+.distributionItem {
+  margin-bottom: $spacing-md;
+
+  &:last-child {
+    margin-bottom: 0;
+  }
+}
+
+.distributionHead {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: $spacing-xs;
+  font-size: $font-size-sm;
+}
+
+.distributionName {
+  color: $color-text-primary;
+  font-weight: $font-weight-medium;
+}
+
+.distributionNum {
+  color: $color-text-secondary;
+}
+
+.barBg {
+  height: 16rpx;
+  background: $color-bg-hover;
+  border-radius: 8rpx;
+  overflow: hidden;
+}
+
+.barFill {
+  height: 100%;
+  border-radius: 8rpx;
+  background: $color-primary-gradient;
+  transition: width $transition-slow;
+}
+
+/* 月度趋势 */
+.trendCard {
+  margin: $spacing-md $page-padding $spacing-lg;
+  background: $color-bg-card;
+  border-radius: $radius-lg;
+  padding: $spacing-lg;
+  box-shadow: $shadow-card;
+}
+
+.trendChart {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  height: 200rpx;
+  padding: $spacing-md 0;
+  gap: $spacing-sm;
+}
+
+.trendBar {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-end;
+  height: 100%;
+}
+
+.barInner {
+  width: 100%;
+  max-width: 60rpx;
+  background: linear-gradient(180deg, #52C41A 0%, #2E8B57 100%);
+  border-radius: 8rpx 8rpx 4rpx 4rpx;
+  min-height: 8rpx;
+  position: relative;
+
+  .barValue {
+    position: absolute;
+    top: -36rpx;
+    left: 50%;
+    transform: translateX(-50%);
+    font-size: 20rpx;
+    color: $color-text-tertiary;
+    white-space: nowrap;
+  }
+}
+
+.barLabel {
+  font-size: $font-size-xs;
+  color: $color-text-tertiary;
+  margin-top: $spacing-xs;
+}
+
+.emptyWrap {
+  padding: $spacing-xxl * 2 $page-padding;
+  text-align: center;
+}
+
+.emptyIcon {
+  font-size: 96rpx;
+  margin-bottom: $spacing-md;
+}
+
+.emptyText {
+  font-size: $font-size-md;
+  color: $color-text-tertiary;
+}

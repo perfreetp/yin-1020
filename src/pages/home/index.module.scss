@@ -1,0 +1,183 @@
+@use '@/styles/variables.scss' as *;
+
+.page {
+  min-height: 100vh;
+  background: $color-bg-page;
+  padding-bottom: 120rpx;
+}
+
+.header {
+  background: $color-primary-gradient;
+  padding: $spacing-xl $page-padding $spacing-xxl;
+  padding-top: 64rpx;
+  color: $color-text-white;
+  position: relative;
+  overflow: hidden;
+
+  &::after {
+    content: '';
+    position: absolute;
+    right: -80rpx;
+    top: -40rpx;
+    width: 300rpx;
+    height: 300rpx;
+    background: rgba(255, 255, 255, 0.08);
+    border-radius: 50%;
+  }
+}
+
+.greeting {
+  font-size: $font-size-lg;
+  font-weight: $font-weight-medium;
+  opacity: 0.95;
+  margin-bottom: $spacing-xs;
+}
+
+.coopName {
+  font-size: $font-size-xxl;
+  font-weight: $font-weight-bold;
+  margin-bottom: $spacing-xs;
+}
+
+.dateText {
+  font-size: $font-size-sm;
+  opacity: 0.8;
+}
+
+.statsRow {
+  display: flex;
+  gap: $spacing-sm;
+  padding: 0 $page-padding;
+  margin-top: -48rpx;
+  position: relative;
+  z-index: 10;
+}
+
+.sectionTitle {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: $spacing-xl $page-padding $spacing-md;
+}
+
+.titleText {
+  font-size: $font-size-lg;
+  font-weight: $font-weight-semibold;
+  color: $color-text-primary;
+}
+
+.titleAction {
+  font-size: $font-size-sm;
+  color: $color-primary;
+}
+
+.quickEntryWrap {
+  padding: 0 $page-padding;
+}
+
+.reminderCard {
+  margin: 0 $page-padding $spacing-md;
+  background: linear-gradient(135deg, #FFF7E6 0%, #FFE7BA 100%);
+  border-radius: $radius-lg;
+  padding: $spacing-lg;
+  display: flex;
+  align-items: center;
+}
+
+.reminderIcon {
+  width: 72rpx;
+  height: 72rpx;
+  border-radius: $radius-round;
+  background: rgba(250, 140, 22, 0.2);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 36rpx;
+  margin-right: $spacing-md;
+  flex-shrink: 0;
+}
+
+.reminderContent {
+  flex: 1;
+  min-width: 0;
+}
+
+.reminderTitle {
+  font-size: $font-size-md;
+  font-weight: $font-weight-semibold;
+  color: $color-accent;
+  margin-bottom: 4rpx;
+}
+
+.reminderText {
+  font-size: $font-size-sm;
+  color: #8B5A00;
+}
+
+.timelineWrap {
+  padding: 0 $page-padding;
+}
+
+.taskSectionCard {
+  background: $color-bg-card;
+  border-radius: $radius-lg;
+  padding: $spacing-lg;
+  box-shadow: $shadow-card;
+}
+
+.ordersSection {
+  padding: 0 $page-padding;
+}
+
+.overviewCard {
+  margin: $spacing-md $page-padding 0;
+  background: $color-bg-card;
+  border-radius: $radius-lg;
+  padding: $spacing-lg;
+  box-shadow: $shadow-card;
+}
+
+.overviewTitle {
+  font-size: $font-size-md;
+  font-weight: $font-weight-semibold;
+  color: $color-text-primary;
+  margin-bottom: $spacing-lg;
+}
+
+.overviewGrid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: $spacing-md;
+}
+
+.overviewItem {
+  text-align: center;
+}
+
+.overviewNum {
+  font-size: $font-size-xl;
+  font-weight: $font-weight-bold;
+  color: $color-primary;
+  line-height: 1.2;
+  margin-bottom: 4rpx;
+}
+
+.overviewNum.orange {
+  color: $color-accent;
+}
+
+.overviewNum.blue {
+  color: $color-info;
+}
+
+.overviewLabel {
+  font-size: $font-size-xs;
+  color: $color-text-secondary;
+}
+
+.emptyHint {
+  padding: $spacing-xl;
+  text-align: center;
+  font-size: $font-size-sm;
+  color: $color-text-tertiary;
+}

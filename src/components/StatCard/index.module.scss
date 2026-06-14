@@ -1,0 +1,51 @@
+@use '@/styles/variables.scss' as *;
+
+.statCard {
+  flex: 1;
+  min-width: 0;
+  background: $color-bg-card;
+  border-radius: $radius-lg;
+  padding: $spacing-lg $spacing-md;
+  box-shadow: $shadow-card;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  transition: all $transition-base;
+
+  &:active {
+    transform: scale(0.98);
+  }
+}
+
+.statValue {
+  font-size: $font-size-xxl;
+  font-weight: $font-weight-bold;
+  color: $color-primary;
+  line-height: 1.2;
+  margin-bottom: $spacing-xs;
+}
+
+.statLabel {
+  font-size: $font-size-sm;
+  color: $color-text-secondary;
+  white-space: nowrap;
+}
+
+.statWarning {
+  .statValue {
+    color: $color-warning;
+  }
+}
+
+.statAccent {
+  .statValue {
+    color: $color-accent;
+  }
+}
+
+.statInfo {
+  .statValue {
+    color: $color-info;
+  }
+}

@@ -1,0 +1,88 @@
+@use '@/styles/variables.scss' as *;
+
+.statusTag {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 4rpx 16rpx;
+  border-radius: $radius-sm;
+  font-size: $font-size-xs;
+  font-weight: $font-weight-medium;
+  white-space: nowrap;
+  line-height: 1.5;
+}
+
+.tagPending {
+  background: rgba(250, 173, 20, 0.12);
+  color: $color-warning;
+}
+
+.tagDispatched {
+  background: rgba(24, 144, 255, 0.12);
+  color: $color-info;
+}
+
+.tagWorking {
+  background: rgba(250, 140, 22, 0.12);
+  color: $color-accent;
+}
+
+.tagDone {
+  background: rgba(82, 196, 26, 0.12);
+  color: $color-success;
+}
+
+.tagSettled {
+  background: rgba(46, 139, 87, 0.12);
+  color: $color-primary;
+}
+
+.tagCancelled {
+  background: rgba(134, 144, 156, 0.12);
+  color: $color-text-tertiary;
+}
+
+.tagRescheduled {
+  background: rgba(24, 144, 255, 0.08);
+  color: $color-info;
+}
+
+.tagIdle {
+  background: rgba(24, 144, 255, 0.12);
+  color: $color-info;
+}
+
+.tagRepair {
+  background: rgba(245, 34, 45, 0.12);
+  color: $color-error;
+}
+
+.tagReserved {
+  background: rgba(250, 173, 20, 0.12);
+  color: $color-warning;
+}
+
+.tagReported {
+  background: rgba(245, 34, 45, 0.12);
+  color: $color-error;
+}
+
+.tagRepairing {
+  background: rgba(250, 140, 22, 0.12);
+  color: $color-accent;
+}
+
+.tagRepairDone {
+  background: rgba(82, 196, 26, 0.12);
+  color: $color-success;
+}
+
+.tagPaid {
+  background: rgba(82, 196, 26, 0.12);
+  color: $color-success;
+}
+
+.tagPartial {
+  background: rgba(250, 140, 22, 0.12);
+  color: $color-accent;
+}

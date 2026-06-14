@@ -1,0 +1,310 @@
+@use '@/styles/variables.scss' as *;
+
+.page {
+  min-height: 100vh;
+  background: $color-bg-page;
+  padding-bottom: 120rpx;
+}
+
+/* 日期选择器 */
+.dateBar {
+  display: flex;
+  gap: $spacing-sm;
+  padding: $spacing-md $page-padding;
+  overflow-x: auto;
+  background: $color-bg-card;
+  box-shadow: 0 2rpx 8rpx rgba(0, 0, 0, 0.04);
+  position: sticky;
+  top: 0;
+  z-index: 20;
+}
+
+.dateChip {
+  flex-shrink: 0;
+  padding: 10rpx 28rpx;
+  border-radius: $radius-button;
+  background: $color-bg-hover;
+  font-size: $font-size-sm;
+  color: $color-text-secondary;
+  font-weight: $font-weight-medium;
+  transition: all $transition-base;
+}
+
+.dateChipActive {
+  background: $color-primary-gradient;
+  color: $color-text-white;
+}
+
+/* 筛选Tab */
+.filterTabs {
+  display: flex;
+  padding: 0 $page-padding;
+  background: $color-bg-card;
+  border-bottom: 1rpx solid $color-divider;
+}
+
+.tabItem {
+  flex: 1;
+  padding: $spacing-md 0;
+  font-size: $font-size-sm;
+  color: $color-text-secondary;
+  text-align: center;
+  position: relative;
+  font-weight: $font-weight-medium;
+  transition: all $transition-base;
+}
+
+.tabItemActive {
+  color: $color-primary;
+  font-weight: $font-weight-semibold;
+
+  &::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 48rpx;
+    height: 6rpx;
+    border-radius: 3rpx;
+    background: $color-primary;
+  }
+}
+
+/* 列表内容 */
+.listWrap {
+  padding: $spacing-md $page-padding;
+}
+
+/* 机械卡片 */
+.machineCard {
+  background: $color-bg-card;
+  border-radius: $radius-lg;
+  margin-bottom: $spacing-md;
+  box-shadow: $shadow-card;
+  overflow: hidden;
+}
+
+.machineHeader {
+  display: flex;
+  align-items: center;
+  padding: $spacing-lg;
+  transition: all $transition-base;
+
+  &:active {
+    background: $color-bg-hover;
+  }
+}
+
+.machineIcon {
+  width: 88rpx;
+  height: 88rpx;
+  border-radius: $radius-md;
+  background: rgba(46, 139, 87, 0.1);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 44rpx;
+  margin-right: $spacing-md;
+  flex-shrink: 0;
+}
+
+.machineInfo {
+  flex: 1;
+  min-width: 0;
+}
+
+.machineName {
+  font-size: $font-size-lg;
+  font-weight: $font-weight-semibold;
+  color: $color-text-primary;
+  margin-bottom: 6rpx;
+  @include text-ellipsis;
+}
+
+.machineSub {
+  font-size: $font-size-sm;
+  color: $color-text-secondary;
+  @include text-ellipsis;
+}
+
+.arrow {
+  font-size: 32rpx;
+  color: $color-text-tertiary;
+  margin-left: $spacing-sm;
+  transition: transform $transition-base;
+}
+
+.arrowUp {
+  transform: rotate(180deg);
+}
+
+/* 展开区 */
+.scheduleBody {
+  padding: 0 $spacing-lg $spacing-lg;
+  border-top: 1rpx solid $color-divider;
+}
+
+.sectionSubTitle {
+  font-size: $font-size-sm;
+  color: $color-text-secondary;
+  padding: $spacing-md 0;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.taskCount {
+  color: $color-primary;
+  font-weight: $font-weight-semibold;
+}
+
+/* 简化时间轴 */
+.simpleTimeline {
+  background: $color-bg-hover;
+  border-radius: $radius-md;
+  padding: $spacing-md;
+}
+
+.taskBlock {
+  display: flex;
+  align-items: center;
+  padding: $spacing-sm 0;
+  border-bottom: 1rpx dashed $color-divider;
+
+  &:last-child {
+    border-bottom: none;
+  }
+}
+
+.taskTime {
+  width: 130rpx;
+  flex-shrink: 0;
+  font-size: $font-size-sm;
+  color: $color-text-secondary;
+  font-weight: $font-weight-medium;
+}
+
+.taskTimeRange {
+  font-size: $font-size-xs;
+  color: $color-text-tertiary;
+  margin-top: 2rpx;
+}
+
+.taskBar {
+  flex: 1;
+  min-width: 0;
+  margin: 0 $spacing-sm;
+  padding: $spacing-sm $spacing-md;
+  border-radius: $radius-sm;
+  background: rgba(46, 139, 87, 0.1);
+  border-left: 6rpx solid $color-primary;
+}
+
+.taskBarWorking {
+  background: rgba(250, 140, 22, 0.1);
+  border-left-color: $color-accent;
+}
+
+.taskBarDone {
+  background: rgba(82, 196, 26, 0.06);
+  border-left-color: $color-success;
+}
+
+.taskName {
+  font-size: $font-size-sm;
+  color: $color-text-primary;
+  font-weight: $font-weight-medium;
+  @include text-ellipsis;
+}
+
+.taskDesc {
+  font-size: $font-size-xs;
+  color: $color-text-secondary;
+  margin-top: 4rpx;
+  @include text-ellipsis;
+}
+
+.freeBlock {
+  background: rgba(134, 144, 156, 0.08);
+  padding: $spacing-sm $spacing-md;
+  border-radius: $radius-sm;
+  text-align: center;
+  margin-top: $spacing-sm;
+}
+
+.freeText {
+  font-size: $font-size-sm;
+  color: $color-text-tertiary;
+}
+
+/* 操作按钮 */
+.cardActions {
+  display: flex;
+  gap: $spacing-sm;
+  margin-top: $spacing-md;
+  padding-top: $spacing-md;
+  border-top: 1rpx solid $color-divider;
+}
+
+.actionBtn {
+  flex: 1;
+  padding: 14rpx;
+  border-radius: $radius-button;
+  font-size: $font-size-sm;
+  font-weight: $font-weight-medium;
+  text-align: center;
+  border: 2rpx solid transparent;
+}
+
+.btnPrimary {
+  background: $color-primary-gradient;
+  color: $color-text-white;
+}
+
+.btnOutline {
+  background: transparent;
+  border-color: $color-primary;
+  color: $color-primary;
+}
+
+.emptyWrap {
+  padding: $spacing-xxl * 2 $page-padding;
+  text-align: center;
+}
+
+.emptyIcon {
+  font-size: 96rpx;
+  margin-bottom: $spacing-md;
+}
+
+.emptyText {
+  font-size: $font-size-md;
+  color: $color-text-tertiary;
+}
+
+/* 顶部概览统计 */
+.summaryBar {
+  display: flex;
+  padding: $spacing-md $page-padding;
+  background: $color-bg-card;
+  border-bottom: 1rpx solid $color-divider;
+  gap: $spacing-md;
+}
+
+.summaryItem {
+  flex: 1;
+  text-align: center;
+}
+
+.summaryNum {
+  font-size: $font-size-xl;
+  font-weight: $font-weight-bold;
+  line-height: 1.2;
+}
+
+.summaryLabel {
+  font-size: $font-size-xs;
+  color: $color-text-tertiary;
+  margin-top: 4rpx;
+}
