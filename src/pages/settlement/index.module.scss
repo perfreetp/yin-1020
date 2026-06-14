@@ -275,6 +275,16 @@
   color: $color-text-white;
 }
 
+.btnGreenOutline {
+  background: rgba(46, 139, 87, 0.08);
+  border-color: $color-primary;
+  color: $color-primary;
+}
+
+.detailValue.orange {
+  color: $color-accent;
+}
+
 /* 季节汇总卡片 */
 .seasonCard {
   margin: $spacing-lg $page-padding 0;

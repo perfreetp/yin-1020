@@ -7,7 +7,8 @@ export default defineAppConfig({
     'pages/map-dispatch/index',
     'pages/maintenance/index',
     'pages/task-finish/index',
-    'pages/reschedule/index'
+    'pages/reschedule/index',
+    'pages/operator-route/index'
   ],
   window: {
     backgroundTextStyle: 'light',

@@ -112,6 +112,7 @@ export interface Order {
   finishTime?: string
   beforePhotos?: string[]
   afterPhotos?: string[]
+  rescheduleReason?: string
   remark?: string
   createdAt: string
 }
@@ -136,6 +137,14 @@ export interface Task {
   lng?: number
 }
 
+export interface SettlementPaymentLog {
+  id: string
+  type: 'farmer_pay' | 'advance' | 'refund' | 'cancel_advance'
+  amount: number
+  time: string
+  remark?: string
+}
+
 // 结算信息
 export interface Settlement {
   id: string
@@ -158,6 +167,7 @@ export interface Settlement {
   profit?: number
   settleDate: string
   status: 'pending' | 'partial' | 'paid' | 'advanced'
+  paymentLogs?: SettlementPaymentLog[]
 }
 
 // 维修记录

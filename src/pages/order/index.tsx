@@ -79,6 +79,7 @@ const OrderPage: React.FC = () => {
   const [remark, setRemark] = useState<string>('')
   const [showSuccess, setShowSuccess] = useState(false)
   const [newOrderNo, setNewOrderNo] = useState('')
+  const [newOrderId, setNewOrderId] = useState('')
 
   const estimatedPrice = useMemo(() => {
     const a = parseFloat(area) || 0
@@ -134,6 +135,7 @@ const OrderPage: React.FC = () => {
       remark: remark.trim() || undefined
     })
     setNewOrderNo(newOrder.orderNo)
+    setNewOrderId(newOrder.id)
     setShowSuccess(true)
     console.log('[Order] 下单成功:', newOrder.orderNo, newOrder.id)
   }
@@ -159,9 +161,18 @@ const OrderPage: React.FC = () => {
     Taro.showToast({ title: '继续下单', icon: 'none' })
   }
 
-  const handleBackHome = () => {
+  const handleGoDispatch = () => {
     setShowSuccess(false)
-    Taro.switchTab({ url: '/pages/home/index' })
+    resetForm()
+    Taro.switchTab({
+      url: '/pages/map-dispatch/index',
+      success: () => {
+        // 延时触发 tabBar 页面内的高亮逻辑（用 storage 传）
+        try {
+          Taro.setStorageSync('highlightOrderId', newOrderId)
+        } catch (e) {}
+      }
+    })
   }
 
   const handleSelectVillage = () => {
@@ -407,8 +418,8 @@ const OrderPage: React.FC = () => {
               <Button className={classnames(styles.successBtn, styles.btnOutline)} onClick={handleContinue}>
                 继续下单
               </Button>
-              <Button className={classnames(styles.successBtn, styles.btnPrimary)} onClick={handleBackHome}>
-                返回首页
+              <Button className={classnames(styles.successBtn, styles.btnPrimary)} onClick={handleGoDispatch}>
+                🚜 立即派工
               </Button>
             </View>
           </View>

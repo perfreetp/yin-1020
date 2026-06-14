@@ -53,16 +53,38 @@ const MapDispatchPage: React.FC = () => {
   const [filterType, setFilterType] = useState<WorkType | 'all'>('all')
   const [selectedOrder, setSelectedOrder] = useState<Order | null>(null)
   const [tick, setTick] = useState(0)
+  const [highlightOrderId, setHighlightOrderId] = useState<string>('')
 
   useDidShow(() => {
     setTick((t) => t + 1)
+    // 读取高亮订单（从下单页跳过来时写入 storage）
+    try {
+      const hl = Taro.getStorageSync('highlightOrderId')
+      if (hl) {
+        setHighlightOrderId(hl)
+        Taro.removeStorageSync('highlightOrderId')
+      }
+    } catch (e) {}
   })
 
   const pendingOrders = useMemo(() => {
     let list = orders.filter((o) => o.status === 'pending' || o.status === 'rescheduled')
     if (filterType !== 'all') list = list.filter((o) => o.workType === filterType)
+    // 高亮订单排最前
+    if (highlightOrderId) {
+      list = [...list].sort((a, b) => {
+        if (a.id === highlightOrderId) return -1
+        if (b.id === highlightOrderId) return 1
+        return 0
+      })
+      // 自动选中高亮的订单
+      const hl = list.find((o) => o.id === highlightOrderId)
+      if (hl) {
+        setTimeout(() => setSelectedOrder(hl), 100)
+      }
+    }
     return list
-  }, [orders, filterType, tick])
+  }, [orders, filterType, tick, highlightOrderId])
 
   const recommendedMachines = useMemo((): { machine: Machine; reason: string }[] => {
     if (!selectedOrder) return []
@@ -186,7 +208,8 @@ const MapDispatchPage: React.FC = () => {
               <View
                 key={order.id}
                 className={classnames(styles.orderChip, {
-                  [styles.orderChipActive]: selectedOrder?.id === order.id
+                  [styles.orderChipActive]: selectedOrder?.id === order.id,
+                  [styles.orderChipHighlight]: highlightOrderId === order.id
                 })}
                 onClick={() => handleOrderSelect(order)}
               >
@@ -194,6 +217,18 @@ const MapDispatchPage: React.FC = () => {
                   <View className={styles.chipFarmer}>
                     <Text>#{idx + 1}</Text>
                     <Text>{order.farmerName}</Text>
+                    {highlightOrderId === order.id && (
+                      <Text style={{
+                        fontSize: 20,
+                        padding: '4rpx 12rpx',
+                        background: 'linear-gradient(90deg, #FA8C16, #FAAD14)',
+                        color: '#fff',
+                        borderRadius: 8,
+                        fontWeight: 600
+                      }}>
+                        ✨ 刚下单
+                      </Text>
+                    )}
                     <Text
                       style={{
                         fontSize: 22,

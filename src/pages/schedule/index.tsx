@@ -308,8 +308,20 @@ const SchedulePage: React.FC = () => {
                               }).catch(() => {})
                             }
                           >
-                            联系机手
+                            📞 联系机手
                           </Button>
+                          {machineTasks.length > 0 && (
+                            <Button
+                              className={classnames(styles.actionBtn, styles.btnOrange)}
+                              onClick={() =>
+                                Taro.navigateTo({
+                                  url: `/pages/operator-route/index?machineId=${m.id}&date=${currentDate}`
+                                })
+                              }
+                            >
+                              🧭 当日路线
+                            </Button>
+                          )}
                           <Button
                             className={classnames(styles.actionBtn, styles.btnPrimary)}
                             onClick={() => handleDispatch(m)}

@@ -268,6 +268,12 @@
   color: $color-primary;
 }
 
+.btnOrange {
+  background: linear-gradient(135deg, #FAAD14 0%, #FA8C16 100%);
+  color: $color-text-white;
+  border: 2rpx solid transparent;
+}
+
 .emptyWrap {
   padding: $spacing-xxl * 2 $page-padding;
   text-align: center;

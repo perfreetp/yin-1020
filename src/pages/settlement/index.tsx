@@ -23,6 +23,7 @@ const SettlementPage: React.FC = () => {
   const markPaid = useAppStore((s) => s.markPaid)
   const markAdvance = useAppStore((s) => s.markAdvance)
   const cancelAdvance = useAppStore((s) => s.cancelAdvance)
+  const recordFarmerRepayment = useAppStore((s) => s.recordFarmerRepayment)
 
   const [activeTab, setActiveTab] = useState<TabType>('pending')
   const [expandedIds, setExpandedIds] = useState<Set<string>>(new Set())
@@ -63,16 +64,22 @@ const SettlementPage: React.FC = () => {
   }
 
   const handleMarkPaid = (item: Settlement) => {
+    const unpaid = item.unpaidAmount || item.totalAmount || 0
+    // 先给个金额输入框
     Taro.showModal({
-      title: '确认收款',
-      content: `确认收到 ${item.farmerName} 的 ¥${formatMoney(item.unpaidAmount || item.totalAmount || 0)} 款项？`,
+      editable: true,
+      title: '登记收款',
+      content: `应收：¥${formatMoney(unpaid)}，输入本次收款金额`,
+      placeholderText: unpaid.toString(),
       confirmText: '确认收款',
       confirmColor: '#2E8B57',
       success: (res) => {
         if (res.confirm) {
-          markPaid(item.id)
-          Taro.showToast({ title: '收款已登记', icon: 'success' })
-          console.log('[Settlement] 收款登记:', item.id)
+          const input = parseFloat(res.content || '')
+          const amount = isNaN(input) || input <= 0 ? unpaid : Math.min(input, unpaid)
+          markPaid(item.id, amount)
+          Taro.showToast({ title: `已登记收款 ¥${formatMoney(amount)}`, icon: 'success' })
+          console.log('[Settlement] 收款登记:', item.id, '¥' + formatMoney(amount))
         }
       }
     })
@@ -94,20 +101,50 @@ const SettlementPage: React.FC = () => {
         }
       })
     } else {
+      const unpaid = item.unpaidAmount || item.totalAmount || 0
       Taro.showModal({
+        editable: true,
         title: '合作社垫付',
-        content: `为 ${item.farmerName} 的订单垫付 ¥${formatMoney(item.unpaidAmount || item.totalAmount || 0)}？`,
+        content: `待垫付：¥${formatMoney(unpaid)}，输入垫付金额`,
+        placeholderText: unpaid.toString(),
         confirmText: '确认垫付',
         confirmColor: '#FA8C16',
         success: (res) => {
           if (res.confirm) {
-            markAdvance(item.id)
-            Taro.showToast({ title: '已标记垫付', icon: 'success' })
-            console.log('[Settlement] 合作社垫付:', item.id)
+            const input = parseFloat(res.content || '')
+            const amount = isNaN(input) || input <= 0 ? unpaid : Math.min(input, unpaid)
+            markAdvance(item.id, amount)
+            Taro.showToast({ title: `已垫付 ¥${formatMoney(amount)}`, icon: 'success' })
+            console.log('[Settlement] 合作社垫付:', item.id, '¥' + formatMoney(amount))
           }
         }
       })
     }
+  }
+
+  const handleFarmerRepay = (item: Settlement) => {
+    const toRepay = item.advanceAmount || 0
+    if (toRepay <= 0) {
+      Taro.showToast({ title: '该订单无需还垫付', icon: 'none' })
+      return
+    }
+    Taro.showModal({
+      editable: true,
+      title: '登记农户回款',
+      content: `农户欠合作社：¥${formatMoney(toRepay)}，输入本次回款金额`,
+      placeholderText: toRepay.toString(),
+      confirmText: '确认回款',
+      confirmColor: '#2E8B57',
+      success: (res) => {
+        if (res.confirm) {
+          const input = parseFloat(res.content || '')
+          const amount = isNaN(input) || input <= 0 ? toRepay : Math.min(input, toRepay)
+          recordFarmerRepayment(item.id, amount)
+          Taro.showToast({ title: `已登记回款 ¥${formatMoney(amount)}`, icon: 'success' })
+          console.log('[Settlement] 农户回款:', item.id, '¥' + formatMoney(amount))
+        }
+      }
+    })
   }
 
   // 季节汇总（从settlements动态计算）
@@ -243,6 +280,30 @@ const SettlementPage: React.FC = () => {
                     </Text>
                   </View>
 
+                  {((item.paidAmount || 0) > 0 || (item.advanceAmount || 0) > 0 || (item.unpaidAmount || 0) > 0) && (
+                    <View
+                      style={{
+                        display: 'flex',
+                        justifyContent: 'space-between',
+                        marginTop: 4,
+                        fontSize: 24,
+                        padding: '8rpx 0',
+                        color: '#4E5969',
+                        gap: 16
+                      }}
+                    >
+                      {(item.paidAmount || 0) > 0 && (
+                        <Text>已收：<Text style={{ color: '#2E8B57', fontWeight: 600 }}>¥{formatMoney(item.paidAmount || 0)}</Text></Text>
+                      )}
+                      {(item.advanceAmount || 0) > 0 && (
+                        <Text>垫付：<Text style={{ color: '#FA8C16', fontWeight: 600 }}>¥{formatMoney(item.advanceAmount || 0)}</Text></Text>
+                      )}
+                      {(item.unpaidAmount || 0) > 0 && (
+                        <Text>待收：<Text style={{ color: '#F5222D', fontWeight: 600 }}>¥{formatMoney(item.unpaidAmount || 0)}</Text></Text>
+                      )}
+                    </View>
+                  )}
+
                   <View className={styles.orderNoRow}>
                     <Text>订单号：{item.orderNo}</Text>
                     <Text>{item.settleDate}</Text>
@@ -298,20 +359,68 @@ const SettlementPage: React.FC = () => {
                       <Text className={styles.label}>📈 本单净利润</Text>
                       <Text className={styles.value}>¥{formatMoney(item.profit || 0)}</Text>
                     </View>
+
+                    {/* 资金流水 */}
+                    {(item.paymentLogs?.length || 0) > 0 && (
+                      <>
+                        <View className={styles.detailDivider} />
+                        <View className={styles.detailTitle}>💸 资金流水</View>
+                        {item.paymentLogs!.map((log) => {
+                          const isOut = log.type === 'cancel_advance'
+                          const isIn = log.type === 'farmer_pay'
+                          const isAdvance = log.type === 'advance'
+                          const typeLabel =
+                            log.type === 'farmer_pay'
+                              ? '农户付款'
+                              : log.type === 'advance'
+                              ? '合作社垫付'
+                              : log.type === 'cancel_advance'
+                              ? '取消垫付'
+                              : log.remark || '操作'
+                          return (
+                            <View key={log.id} className={styles.detailRow}>
+                              <Text className={styles.detailLabel}>
+                                {new Date(log.time).toLocaleDateString()} {typeLabel}
+                              </Text>
+                              <Text
+                                className={classnames(styles.detailValue, {
+                                  [styles.success]: isIn,
+                                  [styles.error]: isOut,
+                                  [styles.orange]: isAdvance
+                                })}
+                              >
+                                {isIn ? '+' : isOut ? '-' : isAdvance ? '垫付 ' : ''}
+                                ¥{formatMoney(log.amount)}
+                              </Text>
+                            </View>
+                          )
+                        })}
+                      </>
+                    )}
                   </View>
                 )}
 
                 {/* 操作按钮 */}
                 {item.status !== 'paid' && (
                   <View className={styles.cardActions}>
-                    {item.status === 'advanced' || item.status === 'partial' ? (
+                    {/* 有垫付额 → 先提供 登记农户回款 */}
+                    {(item.advanceAmount || 0) > 0 && (
+                      <Button
+                        className={classnames(styles.actionBtn, styles.btnGreenOutline)}
+                        onClick={() => handleFarmerRepay(item)}
+                      >
+                        农户还垫付
+                      </Button>
+                    )}
+                    {item.status === 'advanced' || (item.status === 'partial' && (item.advanceAmount || 0) > 0) ? (
                       <Button
                         className={classnames(styles.actionBtn, styles.btnOutline)}
                         onClick={() => handleAdvance(item)}
                       >
                         取消垫付
                       </Button>
-                    ) : (
+                    ) : null}
+                    {(item.status !== 'advanced' && (item.unpaidAmount || 0) > 0) && (
                       <Button
                         className={classnames(styles.actionBtn, styles.btnOrange)}
                         onClick={() => handleAdvance(item)}
@@ -319,13 +428,25 @@ const SettlementPage: React.FC = () => {
                         合作社垫付
                       </Button>
                     )}
+                    {(item.unpaidAmount || 0) > 0 && (
+                      <Button
+                        className={classnames(styles.actionBtn, styles.btnPrimary)}
+                        onClick={() => handleMarkPaid(item)}
+                      >
+                        {item.status === 'partial' ? '收取余款' : '登记收款'}
+                      </Button>
+                    )}
+                  </View>
+                )}
+
+                {/* 已结清：但可能还有欠款（农户没还垫付） */}
+                {item.status === 'paid' && (item.advanceAmount || 0) > 0 && (
+                  <View className={styles.cardActions}>
                     <Button
-                      className={classnames(styles.actionBtn, styles.btnPrimary)}
-                      onClick={() => handleMarkPaid(item)}
+                      className={classnames(styles.actionBtn, styles.btnGreenOutline)}
+                      onClick={() => handleFarmerRepay(item)}
                     >
-                      {item.status === 'partial' || item.status === 'advanced'
-                        ? '收取余款'
-                        : '标记已收'}
+                      农户还垫付（还欠 ¥{formatMoney(item.advanceAmount || 0)}）
                     </Button>
                   </View>
                 )}

@@ -204,6 +204,12 @@
   box-shadow: 0 4rpx 20rpx rgba(46, 139, 87, 0.18);
 }
 
+.orderChipHighlight {
+  border-color: #FA8C16;
+  box-shadow: 0 4rpx 24rpx rgba(250, 140, 22, 0.25);
+  background: linear-gradient(180deg, #FFFBF5 0%, #FFFFFF 100%);
+}
+
 .chipTop {
   display: flex;
   align-items: center;

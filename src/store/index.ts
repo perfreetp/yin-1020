@@ -2,7 +2,7 @@ import { create } from 'zustand'
 import { persist, createJSONStorage } from 'zustand/middleware'
 import Taro from '@tarojs/taro'
 import type {
-  Order, Task, Machine, Settlement,
+  Order, Task, Machine, Settlement, SettlementPaymentLog,
   RepairRecord, MaintenanceRecord, DashboardStats,
   WorkType, OrderStatus, MachineStatus
 } from '@/types'
@@ -74,9 +74,10 @@ export interface AppState {
   // ========== 结算相关 ==========
   createSettlementFromOrder: (orderId: string, actualArea?: number, actualHours?: number) => Settlement | null
   updateSettlement: (id: string, updates: Partial<Settlement>) => void
-  markPaid: (id: string, amount?: number) => void
-  markAdvance: (id: string, amount?: number) => void
-  cancelAdvance: (id: string) => void
+  markPaid: (id: string, amount?: number, remark?: string) => void
+  markAdvance: (id: string, amount?: number, remark?: string) => void
+  cancelAdvance: (id: string, remark?: string) => void
+  recordFarmerRepayment: (id: string, amount: number, remark?: string) => void
 
   // ========== 首页统计 ==========
   getDashboardStats: () => DashboardStats
@@ -212,35 +213,86 @@ const useAppStore = create<AppState>()(
         const order = orders.find((o) => o.id === orderId)
         if (!order) return
 
-        // 移除关联的任务
-        const relatedTasks = tasks.filter((t) => t.orderId === orderId)
+        const wasDispatched = order.status === 'dispatched' || order.status === 'working'
+        const originalMachineId = order.machineId
+        const originalMachineName = order.machineName
 
-        set((state) => ({
-          orders: state.orders.map((o) =>
+        // 移除旧任务（旧日期的）
+        const oldRelatedTasks = tasks.filter((t) => t.orderId === orderId)
+
+        set((state) => {
+          // 构建新的任务集合：移除旧日期的旧任务
+          let newTasks = state.tasks.filter((t) => t.orderId !== orderId)
+
+          // 如果已派工且已派工，要在新日期重新生成新任务
+          if (wasDispatched && originalMachineId) {
+            // 计算新日期该机械已有任务数
+            const seq = newTasks.filter(
+              (t) => t.machineId === originalMachineId && t.workDate === newDate
+            ).length + 1
+            const startHour = 7 + seq * 2
+            const startTime = `${Math.min(startHour, 17).toString().padStart(2, '0')}:00`
+            const endHour = Math.min(startHour + 2, 19)
+            const endTime = `${endHour.toString().padStart(2, '0')}:00`
+            const rescheduledTask = {
+              id: 'task_' + Date.now(),
+              orderId: order.id,
+              orderNo: order.orderNo,
+              machineId: originalMachineId,
+              machineName: originalMachineName || '',
+              farmerName: order.farmerName,
+              address: order.address,
+              workType: order.workType,
+              area: order.area,
+              workDate: newDate,
+              startTime,
+              endTime,
+              sequence: seq,
+              status: 'dispatched',
+              lat: order.lat,
+              lng: order.lng
+            } as Task
+            newTasks = [...newTasks, rescheduledTask]
+          }
+
+          // 更新订单
+          const newOrders = state.orders.map((o) =>
             o.id === orderId
               ? {
                   ...o,
                   workDate: newDate,
-                  status: 'rescheduled',
+                  status: wasDispatched ? ('dispatched' as OrderStatus) : ('rescheduled' as OrderStatus),
+                  rescheduleReason: reason,
                   remark: o.remark
-                    ? `${o.remark}；改期原因：${reason}`
+                    ? `${o.remark}；改期原因：${reason}（原日期：${o.workDate}）`
                     : `改期原因：${reason}（原日期：${o.workDate}）`
                 }
               : o
-          ),
-          tasks: state.tasks.filter((t) => t.orderId !== orderId),
-          // 机械状态恢复：如果该机械当天没有其他任务了，变回idle
-          machines: state.machines.map((m) => {
-            const remainingTasks = state.tasks
-              .filter((t) => t.machineId === m.id && t.orderId !== orderId && t.workDate === newDate)
-            if (m.status === 'reserved' && remainingTasks.length === 0) {
-              return { ...m, status: 'idle' as MachineStatus }
-            }
-            return m
-          })
-        }))
+          )
 
-        console.log('[Store] rescheduleOrder:', orderId, '→', newDate, 'reason:', reason)
+          // 重新计算每台机械的状态：
+          // - 如果原机械状态：如果该机械在 有任务还没 done/没 cancelled 就 reserved/working
+          const newMachines = state.machines.map((m) => {
+            const mTasks = newTasks.filter((t) => t.machineId === m.id && t.status !== 'cancelled' && t.status !== 'done' && t.status !== 'settled')
+            // 当日（今天）有 working 的就 working，否则有任务的 reserved，否则 idle
+            const today = formatDate(new Date().toISOString())
+            const todayMTasks = mTasks.filter((t) => t.workDate === today)
+            if (todayMTasks.some((t) => t.status === 'working')) {
+              return { ...m, status: 'working' as MachineStatus }
+            } else if (mTasks.length > 0) {
+              return { ...m, status: 'reserved' as MachineStatus }
+            }
+            return { ...m, status: 'idle' as MachineStatus }
+          })
+
+          return {
+            orders: newOrders,
+            tasks: newTasks,
+            machines: newMachines
+          }
+        })
+
+        console.log('[Store] rescheduleOrder:', orderId, '→', newDate, 'wasDispatched=' + wasDispatched, 'reason:', reason)
       },
 
       // ===== 任务操作 =====
@@ -362,7 +414,8 @@ const useAppStore = create<AppState>()(
               operatorFee,
               profit,
               settleDate: formatDate(now),
-              status: 'pending'
+              status: 'pending',
+              paymentLogs: []
             }
             newSettlements = [settlement, ...state.settlements]
             console.log('[Store] finishTask: auto-create settlement', settlement.id)
@@ -452,7 +505,8 @@ const useAppStore = create<AppState>()(
           operatorFee,
           profit,
           settleDate: formatDate(new Date().toISOString()),
-          status: 'pending'
+          status: 'pending',
+          paymentLogs: []
         }
 
         set((state) => ({ settlements: [settlement, ...state.settlements] }))
@@ -466,7 +520,7 @@ const useAppStore = create<AppState>()(
         }))
       },
 
-      markPaid: (id, amount) => {
+      markPaid: (id, amount, remark) => {
         const { settlements } = get()
         const s = settlements.find((x) => x.id === id)
         if (!s) return
@@ -474,8 +528,17 @@ const useAppStore = create<AppState>()(
         const payAmount = amount ?? (s.unpaidAmount || 0)
         const newPaid = (s.paidAmount || 0) + payAmount
         const newUnpaid = Math.max(0, (s.unpaidAmount || s.totalAmount) - payAmount)
-        const newStatus: 'pending' | 'partial' | 'paid' =
+        const newStatus: Settlement['status'] =
           newUnpaid <= 0 ? 'paid' : newPaid > 0 ? 'partial' : 'pending'
+
+        // 流水
+        const log: SettlementPaymentLog = {
+          id: 'log_' + Date.now(),
+          type: 'farmer_pay',
+          amount: payAmount,
+          time: new Date().toISOString(),
+          remark: remark || '农户付款'
+        }
 
         // 同步更新订单状态
         const orderId = s.orderId
@@ -487,7 +550,8 @@ const useAppStore = create<AppState>()(
                   ...x,
                   paidAmount: newPaid,
                   unpaidAmount: newUnpaid,
-                  status: newStatus
+                  status: newStatus,
+                  paymentLogs: [...(x.paymentLogs || []), log]
                 }
               : x
           ),
@@ -500,17 +564,28 @@ const useAppStore = create<AppState>()(
         console.log('[Store] markPaid:', id, payAmount, '→', newStatus)
       },
 
-      markAdvance: (id, amount) => {
+      markAdvance: (id, amount, remark) => {
         const { settlements } = get()
         const s = settlements.find((x) => x.id === id)
         if (!s) return
 
         const advAmount = amount ?? (s.unpaidAmount || s.totalAmount || 0)
         const newAdvance = (s.advanceAmount || 0) + advAmount
+        // 注意：垫付不算"农户已付"，paidAmount 不变
+        const newPaid = s.paidAmount || 0
+        // unpaid 减少（因为社里垫了）
         const newUnpaid = Math.max(0, (s.unpaidAmount || s.totalAmount) - advAmount)
-        // 垫付后状态：如果全垫完了就是 advanced，否则还是 partial
-        const newStatus: 'pending' | 'partial' | 'paid' | 'advanced' =
-          newUnpaid <= 0 ? 'advanced' : newAdvance > 0 ? 'partial' : 'pending'
+        // 状态：如果 unpaid 已经没有了，说明账面上还清了，但农户还要还钱给社，所以 advanced
+        const newStatus: Settlement['status'] =
+          newUnpaid <= 0 ? 'advanced' : newPaid > 0 || newAdvance > 0 ? 'partial' : 'pending'
+
+        const log: SettlementPaymentLog = {
+          id: 'log_' + Date.now(),
+          type: 'advance',
+          amount: advAmount,
+          time: new Date().toISOString(),
+          remark: remark || '合作社垫付'
+        }
 
         set((state) => ({
           settlements: state.settlements.map((x) =>
@@ -518,8 +593,10 @@ const useAppStore = create<AppState>()(
               ? {
                   ...x,
                   advanceAmount: newAdvance,
+                  paidAmount: newPaid,
                   unpaidAmount: newUnpaid,
-                  status: newStatus
+                  status: newStatus,
+                  paymentLogs: [...(x.paymentLogs || []), log]
                 }
               : x
           )
@@ -527,16 +604,26 @@ const useAppStore = create<AppState>()(
         console.log('[Store] markAdvance:', id, advAmount, '→', newStatus)
       },
 
-      cancelAdvance: (id) => {
+      cancelAdvance: (id, remark) => {
         const { settlements } = get()
         const s = settlements.find((x) => x.id === id)
         if (!s) return
 
-        const totalAmount = s.totalAmount || 0
-        const paidAmount = s.paidAmount || 0
-        const newUnpaid = totalAmount - paidAmount
-        const newStatus: 'pending' | 'partial' | 'paid' | 'advanced' =
-          paidAmount >= totalAmount ? 'paid' : paidAmount > 0 ? 'partial' : 'pending'
+        const cancelledAdvance = s.advanceAmount || 0
+        // 取消垫付则 unpaid 加回去
+        const newUnpaid = (s.unpaidAmount || 0) + cancelledAdvance
+        const paid = s.paidAmount || 0
+        // 如果新 unpaid >= total，就 pending；否则 partial；full paid
+        const newStatus: Settlement['status'] =
+          paid >= (s.totalAmount || 0) ? 'paid' : paid > 0 ? 'partial' : 'pending'
+
+        const log: SettlementPaymentLog = {
+          id: 'log_' + Date.now(),
+          type: 'cancel_advance',
+          amount: cancelledAdvance,
+          time: new Date().toISOString(),
+          remark: remark || '取消垫付'
+        }
 
         set((state) => ({
           settlements: state.settlements.map((x) =>
@@ -545,12 +632,59 @@ const useAppStore = create<AppState>()(
                   ...x,
                   advanceAmount: 0,
                   unpaidAmount: newUnpaid,
-                  status: newStatus
+                  status: newStatus,
+                  paymentLogs: [...(x.paymentLogs || []), log]
                 }
               : x
           )
         }))
         console.log('[Store] cancelAdvance:', id)
+      },
+
+      // 登记农户回款（针对已垫付的账单，农户把钱还给社里）
+      recordFarmerRepayment: (id, amount, remark) => {
+        const { settlements } = get()
+        const s = settlements.find((x) => x.id === id)
+        if (!s) return
+        if (!s.advanceAmount || s.advanceAmount <= 0) {
+          console.warn('[Store] recordFarmerRepayment: no advance to repay', id)
+          return
+        }
+
+        const repay = Math.min(amount, s.advanceAmount)
+        const newAdvance = (s.advanceAmount || 0) - repay
+        // 回款相当于社里把垫付收回来了，paidAmount + repay（农户真实支付了）
+        const newPaid = (s.paidAmount || 0) + repay
+        // unpaid 已经在垫付时扣了，所以 unpaid 不变
+        const unpaid = s.unpaidAmount || 0
+        const total = s.totalAmount || 0
+        // 状态：如果 paid + advance(剩余) >= total 且 newAdvance==0，就 paid
+        const newStatus: Settlement['status'] =
+          newPaid >= total ? 'paid' : newPaid > 0 || newAdvance > 0 ? 'partial' : 'pending'
+
+        const log: SettlementPaymentLog = {
+          id: 'log_' + Date.now(),
+          type: 'farmer_pay',
+          amount: repay,
+          time: new Date().toISOString(),
+          remark: remark || '农户还垫付'
+        }
+
+        set((state) => ({
+          settlements: state.settlements.map((x) =>
+            x.id === id
+              ? {
+                  ...x,
+                  advanceAmount: newAdvance,
+                  paidAmount: newPaid,
+                  unpaidAmount: unpaid,
+                  status: newStatus,
+                  paymentLogs: [...(x.paymentLogs || []), log]
+                }
+              : x
+          )
+        }))
+        console.log('[Store] recordFarmerRepayment:', id, repay, '→ status=' + newStatus)
       },
 
       // ===== 首页统计 =====
