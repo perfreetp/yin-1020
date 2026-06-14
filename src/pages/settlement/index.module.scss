@@ -89,6 +89,20 @@
   padding: $spacing-lg;
   margin-bottom: $spacing-md;
   box-shadow: $shadow-card;
+  border: 3rpx solid transparent;
+  transition: all $transition-base;
+}
+
+.settleCardHighlight {
+  border-color: #FA8C16;
+  background: linear-gradient(180deg, #FFFBF5 0%, #FFFFFF 100%);
+  box-shadow: 0 6rpx 24rpx rgba(250, 140, 22, 0.2);
+  animation: settle-glow 2s ease-in-out 2;
+}
+
+@keyframes settle-glow {
+  0%, 100% { box-shadow: 0 6rpx 24rpx rgba(250, 140, 22, 0.2); }
+  50% { box-shadow: 0 8rpx 32rpx rgba(250, 140, 22, 0.4); }
 }
 
 .cardTop {

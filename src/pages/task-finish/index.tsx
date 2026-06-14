@@ -98,9 +98,15 @@ const page: React.FC = () => {
         if (res.confirm) {
           const actualArea = chargeType === 'mu' ? val : undefined
           const actualHours = chargeType === 'hour' ? val : undefined
-          finishTask(task.id, actualArea, actualHours, beforePhotos, afterPhotos)
+          const settlement = finishTask(task.id, actualArea, actualHours, beforePhotos, afterPhotos)
           Taro.showToast({ title: '完工已登记', icon: 'success' })
-          console.log('[TaskFinish] 完工提交:', { taskId: task.id, actualArea, actualHours, price: estimatedPrice })
+          console.log('[TaskFinish] 完工提交:', { taskId: task.id, actualArea, actualHours, price: estimatedPrice, settleId: settlement?.id })
+          // 写入高亮结算单ID，方便结算中心定位
+          if (settlement) {
+            try {
+              Taro.setStorageSync('highlightSettleId', settlement.id)
+            } catch (e) {}
+          }
           setTimeout(() => {
             Taro.switchTab({ url: '/pages/settlement/index' })
           }, 1000)

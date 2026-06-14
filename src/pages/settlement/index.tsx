@@ -28,9 +28,42 @@ const SettlementPage: React.FC = () => {
   const [activeTab, setActiveTab] = useState<TabType>('pending')
   const [expandedIds, setExpandedIds] = useState<Set<string>>(new Set())
   const [tick, setTick] = useState(0)
+  const [highlightSettleId, setHighlightSettleId] = useState<string>('')
+  const [scrollIntoView, setScrollIntoView] = useState<string>('')
 
   useDidShow(() => {
     setTick((t) => t + 1)
+    // 读取高亮结算单ID（从完工页跳过来时写入）
+    try {
+      const hl = Taro.getStorageSync('highlightSettleId')
+      if (hl) {
+        setHighlightSettleId(hl)
+        Taro.removeStorageSync('highlightSettleId')
+        // 自动展开 + 切换到正确 tab
+        const s = settlements.find((x) => x.id === hl)
+        if (s) {
+          // 如果是已付清，切到paid tab；否则pending
+          if (s.status === 'paid') {
+            setActiveTab('all')
+          } else {
+            setActiveTab('pending')
+          }
+          // 自动展开
+          setExpandedIds((prev) => {
+            const n = new Set(prev)
+            n.add(hl)
+            return n
+          })
+          // 延迟滚动到视图内（等 tab 切换和渲染完成）
+          setTimeout(() => {
+            setScrollIntoView('settle-card-' + hl)
+            setTimeout(() => setScrollIntoView(''), 500)
+          }, 300)
+        }
+      }
+    } catch (e) {
+      console.warn('[Settlement] 读取 highlightSettleId 失败', e)
+    }
   })
 
   const summaryStats = useMemo(() => {
@@ -188,7 +221,14 @@ const SettlementPage: React.FC = () => {
   const maxArea = Math.max(...seasonSummary.topWorkType.map((x) => x.area), 1)
 
   return (
-    <ScrollView scrollY className={styles.page} enhanced showScrollbar={false}>
+    <ScrollView
+      scrollY
+      className={styles.page}
+      enhanced
+      showScrollbar={false}
+      scroll-into-view={scrollIntoView}
+      scroll-with-animation
+    >
       {/* 顶部头部 */}
       <View className={styles.header}>
         <Text className={styles.headerTitle}>累计营业总收入</Text>
@@ -237,8 +277,15 @@ const SettlementPage: React.FC = () => {
         ) : (
           filteredList.map((item) => {
             const expanded = expandedIds.has(item.id)
+            const isHighlight = highlightSettleId === item.id
             return (
-              <View key={item.id} className={styles.settleCard}>
+              <View
+                key={item.id}
+                id={'settle-card-' + item.id}
+                className={classnames(styles.settleCard, {
+                  [styles.settleCardHighlight]: isHighlight
+                })}
+              >
                 <View onClick={() => toggleExpand(item.id)}>
                   <View className={styles.cardTop}>
                     <View className={styles.farmerInfo}>

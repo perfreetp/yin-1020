@@ -335,6 +335,21 @@
   opacity: 0.4;
 }
 
+.switchBtnDisabled {
+  opacity: 0.35;
+  pointer-events: none;
+}
+
+.switchInfo {
+  flex: 0 0 auto;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: $font-size-sm;
+  color: $color-text-secondary;
+  padding: 0 $spacing-sm;
+}
+
 /* 地图预览区 */
 .miniMapBox {
   margin: 0 $page-padding $spacing-md;

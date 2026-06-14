@@ -302,11 +302,21 @@ const SchedulePage: React.FC = () => {
                         <>
                           <Button
                             className={classnames(styles.actionBtn, styles.btnOutline)}
-                            onClick={() =>
+                            onClick={() => {
+                              if (!m.operatorPhone) {
+                                Taro.showToast({ title: '暂无机手电话', icon: 'none' })
+                                return
+                              }
                               Taro.makePhoneCall({
-                                phoneNumber: m.operatorPhone || '13800138000'
-                              }).catch(() => {})
-                            }
+                                phoneNumber: m.operatorPhone
+                              }).catch(() => {
+                                Taro.showModal({
+                                  title: '机手电话',
+                                  content: m.operatorPhone,
+                                  showCancel: false
+                                })
+                              })
+                            }}
                           >
                             📞 联系机手
                           </Button>
