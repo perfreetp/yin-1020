@@ -5,7 +5,8 @@ import classnames from 'classnames'
 import styles from './index.module.scss'
 import type { WorkType } from '@/types'
 import { WorkTypeMap } from '@/types'
-import { calcOrderPrice, genOrderNo, formatMoney } from '@/utils/format'
+import { calcOrderPrice, formatMoney } from '@/utils/format'
+import useAppStore from '@/store'
 
 const WORK_TYPES: { type: WorkType; icon: string; price: number }[] = [
   { type: 'plow', icon: '🚜', price: 60 },
@@ -62,6 +63,7 @@ const gen7Days = () => {
 
 const OrderPage: React.FC = () => {
   const days7 = useMemo(() => gen7Days(), [])
+  const addOrder = useAppStore((s) => s.addOrder)
 
   const [workType, setWorkType] = useState<WorkType | ''>('harvest')
   const [workTypePrice, setWorkTypePrice] = useState<number>(80)
@@ -109,14 +111,31 @@ const OrderPage: React.FC = () => {
       Taro.showToast({ title: err, icon: 'none' })
       return
     }
-    const orderNo = genOrderNo()
-    console.log('[Order] 提交订单:', {
-      orderNo, workType, farmerName, farmerPhone, area, crop,
-      selectedDate, timeSlot, village, address, remark,
-      estimatedPrice
+    if (!workType) return
+    const areaNum = parseFloat(area) || 0
+    const timeSlotMap: Record<string, string> = {
+      morning: '上午',
+      afternoon: '下午',
+      fullday: '全天'
+    }
+    const newOrder = addOrder({
+      farmerId: farmerId || 'new_' + Date.now(),
+      farmerName: farmerName.trim(),
+      farmerPhone,
+      village,
+      address: address.trim(),
+      workType,
+      cropType: (workType === 'sow' || workType === 'transplant' || workType === 'harvest') ? crop : undefined,
+      area: areaNum,
+      workDate: selectedDate,
+      timeSlot: timeSlotMap[timeSlot],
+      pricePerMu: workTypePrice || undefined,
+      totalPrice: estimatedPrice || undefined,
+      remark: remark.trim() || undefined
     })
-    setNewOrderNo(orderNo)
+    setNewOrderNo(newOrder.orderNo)
     setShowSuccess(true)
+    console.log('[Order] 下单成功:', newOrder.orderNo, newOrder.id)
   }
 
   const resetForm = () => {

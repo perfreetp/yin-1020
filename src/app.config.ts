@@ -5,7 +5,9 @@ export default defineAppConfig({
     'pages/schedule/index',
     'pages/settlement/index',
     'pages/map-dispatch/index',
-    'pages/maintenance/index'
+    'pages/maintenance/index',
+    'pages/task-finish/index',
+    'pages/reschedule/index'
   ],
   window: {
     backgroundTextStyle: 'light',

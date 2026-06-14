@@ -157,7 +157,7 @@ export interface Settlement {
   operatorFee?: number
   profit?: number
   settleDate: string
-  status: 'pending' | 'partial' | 'paid'
+  status: 'pending' | 'partial' | 'paid' | 'advanced'
 }
 
 // 维修记录
